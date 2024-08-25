@@ -1,13 +1,13 @@
-package com.example;
+package rsfost.legacy_escape;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class ExamplePluginTest
+public class LegacyEscapePluginTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(ExamplePlugin.class);
+		ExternalPluginManager.loadBuiltin(LegacyEscapePlugin.class);
 		RuneLite.main(args);
 	}
 }
