@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -36,6 +37,60 @@ public class LegacyEscapePlugin extends Plugin implements KeyListener
 	private volatile boolean interfaceOpen;
 
 	@Override
+	public void keyPressed(KeyEvent keyEvent)
+	{
+		if (keyEvent.getKeyCode() != KeyEvent.VK_ESCAPE)
+		{
+			return;
+		}
+
+		if (!interfaceOpen)
+		{
+			keyEvent.consume();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent keyEvent)
+	{
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent keyEvent)
+	{
+
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded event)
+	{
+		if (interfaceOpen)
+		{
+			return;
+		}
+
+		if (inClosableGroup(event.getGroupId()))
+		{
+			interfaceOpen = true;
+		}
+	}
+
+	@Subscribe
+	public void onWidgetClosed(WidgetClosed event)
+	{
+		if (!interfaceOpen)
+		{
+			return;
+		}
+
+		if (inClosableGroup(event.getGroupId()))
+		{
+			interfaceOpen = false;
+		}
+	}
+
+	@Override
 	protected void startUp() throws Exception
 	{
 		keyManager.registerKeyListener(this);
@@ -53,67 +108,18 @@ public class LegacyEscapePlugin extends Plugin implements KeyListener
 		return configManager.getConfig(LegacyEscapeConfig.class);
 	}
 
-	@Override
-	public void keyPressed(KeyEvent keyEvent)
+	private boolean inClosableGroup(int groupId)
 	{
-		handleKeyEvent(keyEvent);
-	}
-
-	@Override
-	public void keyReleased(KeyEvent keyEvent)
-	{
-
-	}
-
-	@Override
-	public void keyTyped(KeyEvent keyEvent)
-	{
-
-	}
-
-	public synchronized void handleKeyEvent(KeyEvent e)
-	{
-		if (e.getKeyCode() != KeyEvent.VK_ESCAPE)
+		Widget widget = client.getWidget(groupId, 0);
+		for (int i = 0; i < 2 && widget != null; ++i)
 		{
-			return;
+			widget = widget.getParent();
+		}
+		if (widget == null)
+		{
+			return false;
 		}
 
-		if (!interfaceOpen)
-		{
-			e.consume();
-		}
-	}
-
-	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded event)
-	{
-		checkWidget(event.getGroupId());
-	}
-
-	@Subscribe
-	public void onWidgetClosed(WidgetClosed event)
-	{
-		interfaceOpen = false;
-	}
-
-	private void checkWidget(int groupId)
-	{
-		final int resizableId = 10551312;
-		final int fixedId = 35913768;
-
-		Widget resizableContainer = client.getWidget(resizableId);
-		Widget fixedContainer = client.getWidget(fixedId);
-
-		Widget[] children = null;
-		if (resizableContainer != null)
-		{
-			children = resizableContainer.getNestedChildren();
-		}
-		if (fixedContainer != null && (children == null || children.length == 0))
-		{
-			children = fixedContainer.getNestedChildren();
-		}
-
-		interfaceOpen = children != null && children.length > 0;
+		return widget.getId() == ComponentID.RESIZABLE_VIEWPORT_RESIZABLE_VIEWPORT_OLD_SCHOOL_BOX;
 	}
 }
