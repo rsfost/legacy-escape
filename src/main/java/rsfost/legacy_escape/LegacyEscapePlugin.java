@@ -49,6 +49,10 @@ import java.awt.event.KeyEvent;
 )
 public class LegacyEscapePlugin extends Plugin implements KeyListener
 {
+	private static final int RESIZABLE_WIDGET_CONTAINER
+			= ComponentID.RESIZABLE_VIEWPORT_RESIZABLE_VIEWPORT_OLD_SCHOOL_BOX;
+	private static final int FIXED_WIDGET_CONTAINER = 35913737;
+
 	@Inject
 	private Client client;
 
@@ -144,6 +148,6 @@ public class LegacyEscapePlugin extends Plugin implements KeyListener
 			return false;
 		}
 
-		return widget.getId() == ComponentID.RESIZABLE_VIEWPORT_RESIZABLE_VIEWPORT_OLD_SCHOOL_BOX;
+		return widget.getId() == RESIZABLE_WIDGET_CONTAINER || widget.getId() == FIXED_WIDGET_CONTAINER;
 	}
 }
