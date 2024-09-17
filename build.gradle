@@ -27,7 +27,7 @@ dependencies {
 }
 
 group = 'rsfost.legacy-escape'
-version = '0.1'
+version = '0.2-SNAPSHOT'
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
